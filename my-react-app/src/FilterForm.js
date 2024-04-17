@@ -1,16 +1,16 @@
-// FilterForm.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import moment from 'moment';
 
-const FilterForm = ({ onFilter }) => {
+const FilterForm = ({ onDataFiltered }) => {
   const [startTime, setStartTime] = useState('');
-  const [frequency, setFrequency] = useState('');
+  const [frequency, setFrequency] = useState('1-hour'); // Default frequency
 
-  const handleSubmit = async (e) => {
+  const handleFilter = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.get(`/filter-data/${frequency}?startTime=${startTime}`);
-      onFilter(response.data.filteredData);
+      onDataFiltered(response.data.filteredData);
     } catch (error) {
       console.error('Error fetching data:', error);
       // Handle error
@@ -18,8 +18,12 @@ const FilterForm = ({ onFilter }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+    <form onSubmit={handleFilter}>
+      <input
+        type="datetime-local"
+        value={startTime}
+        onChange={(e) => setStartTime(moment(e.target.value).toISOString())} // Convert to ISO format
+      />
       <select value={frequency} onChange={(e) => setFrequency(e.target.value)}>
         <option value="1-hour">1 Hour</option>
         <option value="8-hour">8 Hours</option>
